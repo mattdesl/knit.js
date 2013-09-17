@@ -4,9 +4,11 @@
   <head>
     <meta name="viewport" content="width=device-width">
     <title>Woven Silk</title>
-<!--    <link rel="stylesheet" href="/css/normalize.min.css">-->
+<!--    <link rel="stylesheet" href="/css/normalize.min.css">--> 
     <script src="js/vendor/jquery-1.10.1.min.js" type="text/javascript"></script>
        
+    <script src="js/vendor/stats.min.js"></script>
+    <script src="js/vendor/raf.js"></script>
     <script src="js/vendor/poly2tri.js"></script>
     <script src="js/vendor/typeface-0.15.js"></script>
     <script src="js/vendor/helvetiker_regular.typeface.js"></script>
@@ -16,31 +18,71 @@
     <script src="js/vendor/montserrat_regular.typeface.js"></script>
     <script src="js/vendor/stalemate_regular.typeface.js"></script>
       
-    <script src="js/Knit.js"></script>
-    <script src="js/TypeUtil.js"></script>
+    <script src="js/knit.js"></script>
+
+
+    <style>
+        * { margin: 0; padding: 0; }
+        
+        body { background-color: white; color: black; font-family: sans-serif; font-size: 14px; }
+        
+        div.text {
+            padding: 10px;
+            position: absolute; 
+            top: 510px;
+        }
+        a {
+            color: gray;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #61aabd;
+        }
+    </style>
   </head>
     
   <body> 
       
       <div id="canvas-container">
+          <canvas id="canvas" moz-opaque></canvas>
       </div>  
 <script>
     var width = window.innerWidth;
     var height = 500;
-    $("<canvas/>", {
-        id: "canvas",
-    }).css({
-        "position": "absolute",
-        "top": 0,
-        "left": 0 
-    }).appendTo($("#canvas-container"));
+    $("#canvas").css({
+        "position": "fixed",
+        "transform": "translateZ(0)",
+        "top": 0, 
+        "left": 0,
+        "background-color": "white"
+    });
     var canvas = $("#canvas");
     canvas[0].width = width;
     canvas[0].height = height;
     
-    var context = canvas[0].getContext("2d");
+    var frameLength = 33; // this is ~1/30th of a second, in milliseconds (1000/30)
+    var lastFrame = 0;
     
-    setInterval(update, 1000/60);
+    var context = canvas[0].getContext("2d");
+        
+    var stats = new Stats();
+    stats.setMode(1); // 0: fps, 1: ms
+    
+    // Align top-left
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0px';
+    stats.domElement.style.top = '0px';
+    $("body").append(stats.domElement);
+    
+    var STATUS = $("<p>").css({
+        "position":"absolute",
+        "left":"100px"
+    });
+    
+    $("#canvas-container").append( STATUS );
+        
+    //setInterval(update, 1000/60);
+    window.requestAnimationFrame(update);
     
     var clothWidth = 30;
     var clothHeight = 25;
@@ -48,14 +90,14 @@
     var start_y = 100;
     var spacing = 6;
     var stiff = 1.0;
-    var tear = 300;
+    var tear = 15;
     
-    var mouseInfluence = 10;
+    var mouseInfluence = 25;
     var mouseScale = 0.4;
     var mouseMaxDist = 15;
     
     var mouseTearInfluence = 5;
-    var gravity = 50;
+    var gravity = 500;
     var mass = 1.;
     var useFloor = true;
     var useTriangles = false;
@@ -72,7 +114,7 @@
     var world = new Knit.World(new Knit.Vec2(0, gravity));
     
     
-    world.setPinRemoveInfluence(50);
+    // world.setPinRemoveInfluence(25);
     
     var testShape = null;
     var mouseX=0, mouseY=0;
@@ -161,7 +203,6 @@
     
     function asPointSet(points) {
         var contour = [];
-        
         
         for (var n=0; n<points.length; n++) {
             var x = points[n].x;
@@ -262,7 +303,6 @@
     function addClothShapeMass(fontShape, start_x, start_y, mass) {
         var cloth_height = (fontShape.lineHeight/spacing);
         var cloth_width = (fontShape.xadvance/spacing);
-        
         
         var grid = [];
         var x, y;
@@ -466,111 +506,138 @@
     
     var stepper = 100;
     
-    function update() { 
-        context.clearRect(0, 0, width, height);
+    function update() {
+        window.requestAnimationFrame(update);
+        stats.begin();
         
-        world.step(.016);
-
-        if (enableWind) {
-            context.fillStyle = "black";
-            stepper++;
-            if (stepper>1000)
-                stepper = 100;
-            var windX = width/2 + Math.sin(stepper*0.0035 * Math.cos(stepper*0.01)) * width/2;
-            var windY = height/2 + Math.sin(stepper*0.05) * height/2;
+        if(true || Date.now() - lastFrame > frameLength) {
+            lastFrame = Date.now()
+        
+            context.clearRect(0, 0, width, height);
+        
+            world.accuracy = 1;
+            world.step(.016);
+    
+            if (enableWind) {
+                context.fillStyle = "black";
+                stepper++;
+                if (stepper>1000)
+                    stepper = 100;
+                var windX = width/2 + Math.sin(stepper*0.0035 * Math.cos(stepper*0.01)) * width/2;
+                var windY = height/2 + Math.sin(stepper*0.05) * height/2;
+                
+    //            var windY = height / 2;
+    //            var windX = width / 2 + Math.sin(stepper * 0.05) * width/2;
+                context.fillRect(windX, windY, 10, 10);
+                world.applyTear(windX, windY, mouseInfluence);
+                world.applyMotion(windX, windY, mouseInfluence, mouseScale, mouseMaxDist);
+            }
             
-//            var windY = height / 2;
-//            var windX = width / 2 + Math.sin(stepper * 0.05) * width/2;
-            context.fillRect(windX, windY, 10, 10);
-            world.applyTear(windX, windY, mouseInfluence);
-            world.applyMotion(windX, windY, mouseInfluence, mouseScale, mouseMaxDist);
-        }
-        
-        if (testShape!==null) {
-            context.fillStyle = pointInComplexShape(testShape, mouseX, mouseY) ? "blue" : "red";
-                
-            var polys = testShape.polygons;
-            context.save();
-            for (var k=0; k<polys.length; k++) {
-                context.beginPath();    
-                var pt;
-                
-                context.strokeStyle= "red";
-                
-                var shape = polys[k];
-                
-                context.moveTo(shape.contour[0].x, shape.contour[0].y);
-                //draw shape
-                for (var v=0; v<shape.contour.length; v++) {
-                    pt = shape.contour[v];
+            if (testShape!==null) {
+                context.fillStyle = pointInComplexShape(testShape, mouseX, mouseY) ? "blue" : "red";
                     
-                    context.lineTo(pt.x, pt.y); 
-                }
-                //draw holes
-                for (var v=0; v<shape.holes.length; v++) {
-                    var h = shape.holes[v];
+                var polys = testShape.polygons;
+                context.save();
+                for (var k=0; k<polys.length; k++) {
+                    context.beginPath();    
+                    var pt;
                     
-                    context.moveTo(h[0].x, h[0].y);
-                    for (var count=0; count<h.length; count++) {
-                        pt = h[count];
+                    context.strokeStyle= "red";
+                    
+                    var shape = polys[k];
+                    
+                    context.moveTo(shape.contour[0].x, shape.contour[0].y);
+                    //draw shape
+                    for (var v=0; v<shape.contour.length; v++) {
+                        pt = shape.contour[v];
+                        
                         context.lineTo(pt.x, pt.y); 
-                    } 
+                    }
+                    //draw holes
+                    for (var v=0; v<shape.holes.length; v++) {
+                        var h = shape.holes[v];
+                        
+                        context.moveTo(h[0].x, h[0].y);
+                        for (var count=0; count<h.length; count++) {
+                            pt = h[count];
+                            context.lineTo(pt.x, pt.y); 
+                        } 
+                    }
+                    
+                    context.closePath();
+                    context.fill();
+                    
+                }
+                context.restore();
+                
+                 var sz = 2;
+                context.fillStyle = "black";
+                for (var y=0; y<(testShape.lineHeight/spacing); y++) {
+                    for (var x=0; x<(testShape.xadvance/spacing); x++) {
+                        var xp = x * spacing - sz/2, yp = y * spacing - sz/2;
+                        if (pointInComplexShape(testShape, xp, yp))
+                            context.fillRect(xp, yp, sz, sz);
+                    }
+                }
+            }
+            
+    //        var near = nearestPoint(testShape.polygons[0].contour, mouseX, mouseY);
+    //        if (near) {
+    //            context.fillStyle = "black";
+    //            context.fillRect(near.x, near.y, 3, 3);
+    //        }
+    //        
+           
+            var lines = 0;
+            var flushes = 0;
+            
+            var i = world.points.length;
+            context.beginPath();
+            while (i-- > 1) {
+                var p = world.points[i];    
+                context.fillStyle = "blue";
+                context.strokeStyle = "rgba(0,0,0,0.75)";
+                context.lineWidth = .5;
+                
+                for (var j=0; j<p.constraints.length; j++) {
+                    var c = p.constraints[j];
+                    context.moveTo(c.p1.position.x, c.p1.position.y);
+                    context.lineTo(c.p2.position.x, c.p2.position.y);
+//                    context.fillRect(~~c.p1.position.x, ~~c.p2.position.y, 1, 1);
+                    lines++;
                 }
                 
-                context.closePath();
-                context.fill();
-                
-            }
-            context.restore();
-            
-             var sz = 2;
-            context.fillStyle = "black";
-            for (var y=0; y<(testShape.lineHeight/spacing); y++) {
-                for (var x=0; x<(testShape.xadvance/spacing); x++) {
-                    var xp = x * spacing - sz/2, yp = y * spacing - sz/2;
-                    if (pointInComplexShape(testShape, xp, yp))
-                        context.fillRect(xp, yp, sz, sz);
+                if (i % (660/3) == 0) {
+                    context.stroke();
+                    context.beginPath();
+                    flushes++;
                 }
+                    
+    //                context.fillRect(c.p1.position.x, c.p1.position.y, 2, 2);
+                
+    //            context.moveTo(p.position.x, p.position.y);
+    //            conte
+    //            context.fillRect(p.position.x, p.position.y, 5, 5);
             }
+    //        context.closePath();
+    //        context.fill();
+            context.stroke();
+            
+            
+            // STATUS.text("Lines: "+lines+", Flushes: "+flushes);
         }
         
-//        var near = nearestPoint(testShape.polygons[0].contour, mouseX, mouseY);
-//        if (near) {
-//            context.fillStyle = "black";
-//            context.fillRect(near.x, near.y, 3, 3);
-//        }
-//        
-       
-        
-        var i = world.points.length;
-        context.beginPath();
-        while (i-- > 1) {
-            var p = world.points[i];    
-            context.fillStyle = "red";
-            context.strokeStyle = "rgba(25,25,25,0.95)";
-            context.lineWidth = 0.5;
-            
-            for (var j=0; j<p.constraints.length; j++) {
-                var c = p.constraints[j];
-                context.moveTo(c.p1.position.x, c.p1.position.y);
-                context.lineTo(c.p2.position.x, c.p2.position.y);
-            }
-            
-//                context.fillRect(c.p1.position.x, c.p1.position.y, 2, 2);
-            
-//            context.moveTo(p.position.x, p.position.y);
-//            conte
-//            context.fillRect(p.position.x, p.position.y, 5, 5);
-        }
-        context.closePath();
-        context.stroke();
-        
+        stats.end();
 //        context.fontStyle = "arial";
 //        context.fillStyle = "black"; 
 //        context.fillText(world.points.length, 50, 50);
     }
 </script>
        
-<!--      <div>Hi thasere</div>-->
+   <div class="text">
+      <p>click & drag to tear -- space to reset -- type any key to see the letter</p>
+      <p>others: <a href="web.html">web</a>, <a href="fabric.html">fabric</a><p>
+    </div>
+  </body>
   </body>
 </html>

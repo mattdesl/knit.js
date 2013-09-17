@@ -16,21 +16,18 @@
     <script src="js/vendor/montserrat_regular.typeface.js"></script>
     <script src="js/vendor/stalemate_regular.typeface.js"></script>
       
-    <script src="js/Knit.js"></script>
-    <script src="js/TypeUtil.js"></script>
-    <script src="js/KnitWeb.js"></script>
+    <script src="js/knit.js"></script>
     
     <script src="js/vendor/raf.js"></script>
-    <script src="js/CanvasUtil.js"></script>
     
     <style type="text/css">
         * { margin: 0; padding: 0; }
         
-        body { background-color: black; }
-
+        body { background-color: white; }
+/*        canvas { background-color: red; }*/
     </style>
   </head>
-    
+     
   <body> 
       
       <div id="canvas-container">
@@ -56,6 +53,7 @@
     
     var world = new Knit.World(new Knit.Vec2(0, gravity));
     world.setPinRemoveInfluence(50);
+    var endPoint = null;
     
     CanvasUtil.addPinInteraction(canvas, world);
     
@@ -69,11 +67,13 @@
     
     $(document).keypress(function(e) {
         world.points = [];
-        createWeb();
+        createFabrics(); 
     }); 
     $(function() {
-        createWeb();
-    });
+        createFabrics();
+        
+        
+    });  
     
     var mouseDown = false;
     canvas.mousedown(function(ev) {
@@ -92,45 +92,80 @@
             world.applyMotion(ev.clientX, ev.clientY, mouseInfluence, mouseScale, mouseMaxDist);
         } else
             world.applyMotion(ev.clientX, ev.clientY, mouseInfluence, mouseScale, mouseMaxDist);
-        mouseX = ev.pageX;
-        mouseY = ev.pageY;
+        mouseX = ev.clientX;
+        mouseY = ev.clientY;
     });
     
-    function createWeb() {
-        web = new Knit.Web();
-        web.cx = width/2;
-        web.cy = height/2;
-        web.radius = Math.min(width, height)*0.5;
-        web.spirals = 20; 
-        web.spokes = 30; 
-        web.create();
-        //10, 15, Math.min(width, height)*0.25, 1, width/2, height/2
-         
-        world.addPoints(web.points);
-//        console.log(world.points[0].position.y);
+    function createFabrics() {
+//        var str = new Knit.Twine({ start:new Knit.Vec2(100, 100), end:new Knit.Vec2(110, 150), steps: 50 });
+//        endPoint = str.points[str.points.length-1];    
+//        world.addPoints(str.points);
+        
+        var path = new Knit.Path();
+//        path.tearDistance = 50;
+        path.stiffness = 0.99;
+        path.steps = 1;
+        
+//        path.pinNext(); 
+//        path.moveTo(300, 50);
+//        path.lineTo(310, 100);
+//        
+//        path.moveTo(500, 40);
+//        path.pinNext();
+//        path.lineTo(550, 100);
+//        path.pinLast();
+//        path.lineTo(600, 70); 
+//        path.pinLast();
+//        path.close();
+//        path.pinLast();
+        
+        path.pinNext();
+        path.moveTo(100,60);
+        path.quadraticCurveTo(20,100,200,20);
+        path.pinLast();
+        
+        console.log(path.points.length);
+        
+        world.addPoints(path.points);
     }
-    
-    var randColors = [];
-    for (var i=0; i<100; i++) {
-        randColors.push( "rgba("+ ~~(Math.random()*255) +", " + ~~(Math.random()*255) +", "+ ~~(Math.random()*255) +", 1.0)" );
-    }
-    
+     
     function update() { 
         context.clearRect(0, 0, width, height);
         
         world.step(0.016);
         
-        context.fillStyle = "white";
-        context.strokeStyle = "white";
-        context.lineWidth = 0.75;
-        CanvasUtil.drawPoints(world, context); 
+        context.fillStyle = "black";
+        context.strokeStyle = "black";
+        context.lineWidth = 0.5;
         
-        context.strokeStyle = "rgba(127, 127, 127, 0.85)";
-        context.lineWidth = 1.0;
+        CanvasUtil.drawPoints(world, context);
         CanvasUtil.drawPins(world, context);
+        
+        if (endPoint) {
+            context.fillStyle = "red";
+            var sz = 10;
+            context.fillRect(endPoint.position.x-sz/2, endPoint.position.y-sz/2, sz, sz);
+        }
+        
+        context.beginPath(); 
+//        context.moveTo(300, 250);
+//        context.lineTo(310, 200);
+//        context.lineTo(500, 500);
+//        
+//        context.moveTo(400, 250);
+//        context.lineTo(450, 300);
+//        context.lineTo(500, 200);
+//        context.moveTo(500, 500);
+        
+        
+        context.moveTo(20,20);
+//        context.bezierCurveTo(20,100,200,100,200,20);
+        
+//        context.closePath();
+        context.stroke();
     }
 </script>
        
-<!--      <div>Hi thasere</div>-->    
+<!--      <div>Hi thasere</div>-->
   </body>
 </html>

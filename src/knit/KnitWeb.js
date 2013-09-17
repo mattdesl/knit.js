@@ -24,11 +24,11 @@
         this.hubRadius = 20;
         this.cx = 0;
         this.cy = 0;
-        this.centerMass = 5;
-        this.webMass = 5;
+        this.centerMass = 1;
+        this.webMass = 10;
         
         this.tensor = 0.5;
-        this.stiffness = 0.05;
+        this.stiffness = 0.15;
         this.tearDistance = 100;
         
         this.missChanceLow = 0.20;
@@ -40,7 +40,7 @@
         
         // a list of point masses for this fabric
         this.points = [];
-        
+         
         // allows user to specify particular params in constructor
         if (paramsDict && typeof paramsDict === "object") {
             for (var k in paramsDict) {
@@ -111,6 +111,7 @@
                 
                 var before = (pointMassLen-1 - this.spokes+1);
                 if (before > 0 && before < pointMassLen-1) {
+
                     var cnstr = p.attach( this.points[before], null, this.stiffness, this.tearDistance );
                     cnstr.restingDistance *= this.tensor; 
                 }
@@ -150,7 +151,8 @@
                 var offRnd = Math.random() ? -1 : 1;
                 var spanRnd = Math.random() > 0.5 ? 1 : -1;
                 var otherIdx = j + (spanRnd * this.spokes) + offRnd;
-                this.points[j].attach( this.points[otherIdx], null, this.stiffness, this.tearDistance );
+                if (otherIdx >= 0 && otherIdx < this.points.length-1)
+                    this.points[j].attach( this.points[otherIdx], null, this.stiffness, this.tearDistance );
             } 
             
             var randCuts = randomIndices(pointMassLen-1-this.spokes, 

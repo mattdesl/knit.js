@@ -3,10 +3,11 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width">
-    <title>Woven Silk</title>
+    <title>knit.js test</title>
 <!--    <link rel="stylesheet" href="/css/normalize.min.css">-->
     <script src="js/vendor/jquery-1.10.1.min.js" type="text/javascript"></script>
        
+    <script src="js/vendor/stats.min.js"></script>
     <script src="js/vendor/poly2tri.js"></script>
     <script src="js/vendor/typeface-0.15.js"></script>
     <script src="js/vendor/helvetiker_regular.typeface.js"></script>
@@ -16,8 +17,26 @@
     <script src="js/vendor/montserrat_regular.typeface.js"></script>
     <script src="js/vendor/stalemate_regular.typeface.js"></script>
       
-    <script src="js/Knit.js"></script>
-    <script src="js/TypeUtil.js"></script>
+    <script src="js/knit.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; }
+        
+        body { background-color: white; color: black; font-family: sans-serif; font-size: 14px; }
+        
+        div.text {
+            padding: 10px;
+            position: absolute; 
+            top: 510px;
+        }
+        a {
+            color: gray;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #61aabd;
+        }
+    </style>
   </head>
     
   <body> 
@@ -37,6 +56,16 @@
     var canvas = $("#canvas");
     canvas[0].width = width;
     canvas[0].height = height;
+    
+    var stats = new Stats();
+    stats.setMode(1); // 0: fps, 1: ms
+    
+    // Align top-left
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0px';
+    stats.domElement.style.top = '0px';
+    $("body").append(stats.domElement);
+    
     
     var context = canvas[0].getContext("2d");
     
@@ -461,8 +490,7 @@
         var i, j, c = 0;
         for (i=0, j=nvert-1; i<nvert; j=i++) {
             if ( ((points[i].y>testy) != (points[j].y>testy)) &&
-                (testx < (points[j].x-points[i].x) * (testy-points[i].y)
-                 / (points[j].y-points[i].y) + points[i].x) ) {
+                (testx < (points[j].x-points[i].x) * (testy-points[i].y) / (points[j].y-points[i].y) + points[i].x) ) {
                 c = !c;
             }
         }
@@ -472,6 +500,8 @@
     var stepper = 100;
     
     function update() { 
+        stats.begin();
+        
         context.clearRect(0, 0, width, height);
         
         world.step(.016);
@@ -534,7 +564,7 @@
                         context.fillRect(xp, yp, sz, sz);
                 }
             }
-        }
+        } 
         
 //        var near = nearestPoint(testShape.polygons[0].contour, mouseX, mouseY);
 //        if (near) {
@@ -567,12 +597,16 @@
         context.closePath();
         context.stroke();
         
+        stats.end();
+        
 //        context.fontStyle = "arial";
 //        context.fillStyle = "black"; 
 //        context.fillText(world.points.length, 50, 50);
     }
 </script>
-       
-<!--      <div>Hi thasere</div>-->
+   <div class="text">
+      <p>space to reset -- move mouse to shatter -- type a key to show it</p>
+      <p>also see <a href="web.html">web</a></p>
+    </div>
   </body>
 </html>
