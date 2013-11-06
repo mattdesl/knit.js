@@ -34,10 +34,10 @@ $(function() {
     var mouseMaxDist = 15;
     var steps = 6;
     
-    var mouseTearInfluence = 4;
+    var mouseTearInfluence = 2;
     var gravity = 0;
     var mass = 1.;
-    var useFloor = true;
+    var useFloor = false;
     
 
     var usePins = false; //we need to pin the cloth up if we have gravity enabled
