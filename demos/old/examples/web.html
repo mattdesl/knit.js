@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <title>knit.js test</title>
+<!--    <link rel="stylesheet" href="/css/normalize.min.css">-->
+<!--    <script src="js/vendor/jquery-1.10.1.min.js" type="text/javascript"></script>-->
+    <script src="js/vendor/jquery-1.10.1.min.js"></script>
+    <script src="js/vendor/poly2tri.js"></script>
+    <script src="js/vendor/typeface-0.15.js"></script>
+    <script src="js/vendor/helvetiker_regular.typeface.js"></script>
+    <script src="js/vendor/helvetiker_bold.typeface.js"></script>
+    <script src="js/vendor/helvetiker_bold_italic.typeface.js"></script>
+    <script src="js/vendor/montserrat_bold.typeface.js"></script>
+    <script src="js/vendor/montserrat_regular.typeface.js"></script>
+    <script src="js/vendor/stalemate_regular.typeface.js"></script>
+      
+    <script src="js/knit.js"></script>
+     
+    <script src="js/vendor/raf.js"></script>
+    
+    <style type="text/css">
+        * { margin: 0; padding: 0; }
+        
+        body { background-color: black; color: white; font-family: sans-serif; font-size: 14px; }
+        
+        div.text {
+            padding: 10px;
+            position: absolute; 
+            top: 510px;
+        }
+        a {
+            color: gray;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #61aabd;
+        }
+    </style>
+  </head>
+    
+  <body> 
+      
+      <div id="canvas-container">
+      </div>  
+<script>
+    var width = 500, height = 500;
+    var canvas = CanvasUtil.createCanvas(width, height);
+    canvas.appendTo($("#canvas-container"));
+    
+    var context = canvas[0].getContext("2d");
+    
+    setInterval(update, 1000/60);
+    
+    var mouseInfluence = 15;
+    var mouseScale = 0.5;
+    var mouseMaxDist = 15;
+    
+    var mouseTearInfluence = 15;
+    var gravity = 1200;
+    var useFloor = true;
+    
+    var enableWind = false;
+    
+    var world = new Knit.World(new Knit.Vec2(0, gravity));
+    world.setPinRemoveInfluence(50);
+    
+    CanvasUtil.addPinInteraction(canvas, world);
+        
+    var mouseX=0, mouseY=0;
+    var web = null;
+    
+    if (useFloor) {
+        world.bounds = new Knit.Rect(0, 0, width, height);
+        world.floor = height-5;
+    }
+    
+    $(document).keypress(function(e) {
+        world.points = [];
+        createWeb();
+    }); 
+    $(function() {
+        createWeb();
+    });
+    
+    var mouseDown = false;
+    canvas.mousedown(function(ev) {
+        if (ev.which == 1)
+            mouseDown = true;
+    });
+    canvas.mouseup(function(ev) {
+        if (ev.which == 1)
+            mouseDown = false;
+    });
+     
+    canvas.mousemove(function(ev) {
+        if (mouseDown) {
+            if (!CanvasUtil.isMouseOverPin())
+                world.applyTear(ev.clientX, ev.clientY, mouseTearInfluence);
+            world.applyMotion(ev.clientX, ev.clientY, mouseInfluence, mouseScale, mouseMaxDist);
+        } else
+            world.applyMotion(ev.clientX, ev.clientY, mouseInfluence, mouseScale, mouseMaxDist);
+        mouseX = ev.pageX;
+        mouseY = ev.pageY;
+    });
+    
+    function createWeb() {
+        web = new Knit.Web();
+        web.cx = width/2 + 50;
+        web.cy = height/2 + 50;
+        web.radius = Math.min(width, height)*0.35;
+        web.spirals = 15; 
+        web.spokes = 15; 
+        web.create();
+        //10, 15, Math.min(width, height)*0.25, 1, width/2, height/2
+         
+        world.addPoints(web.points);
+//        console.log(world.points[0].position.y);
+    }
+    
+    var randColors = [];
+    for (var i=0; i<100; i++) {
+        randColors.push( "rgba("+ ~~(Math.random()*255) +", " + ~~(Math.random()*255) +", "+ ~~(Math.random()*255) +", 1.0)" );
+    }
+    
+    function update() { 
+        context.clearRect(0, 0, width, height);
+        
+        world.step(0.016);
+        
+        context.fillStyle = "white";
+        context.strokeStyle = "white";
+        context.lineWidth = 0.75;
+        CanvasUtil.drawPoints(world, context); 
+        
+        context.strokeStyle = "rgba(127, 127, 127, 0.85)";
+        context.lineWidth = 1.0;
+        CanvasUtil.drawPins(world, context);
+    }
+</script>
+       
+    <div class="text">
+      <p>click & drag to tear -- space to reset</p>
+      <p>also see <a href="glass.html">glass</a></p>
+    </div>
+  </body>
+</html>

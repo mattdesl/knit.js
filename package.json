@@ -1,0 +1,26 @@
+{
+  "name": "knit",
+  "version": "0.0.0",
+  "description": "knit.js is a simple Verlet physics engine for fabric, string and cloth effects",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "gl-matrix": "toji/gl-matrix.git#v2.2.0",
+    "jsOOP": "git://github.com/mattdesl/jsOOP",
+    "minivec": "git://github.com/mattdesl/minivec",
+    "minimath": "git://github.com/mattdesl/minimath"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "browserify": "~2.35.0",
+    "grunt-browserify": "~1.2.9",
+    "grunt-contrib-watch": "~0.5.3",
+    "load-grunt-tasks": "~0.2.0",
+    "grunt-contrib-yuidoc": "~0.5.0",
+    "grunt-contrib-uglify": "~0.2.5"
+  }
+}

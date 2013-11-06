@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <title>Woven Silk</title>
+<!--    <link rel="stylesheet" href="/css/normalize.min.css">-->
+    <script src="js/jquery-1.10.1.min.js" type="text/javascript"></script>
+  </head>
+    
+  <body>
+      
+      <div id="canvas-container" >
+        
+      </div>
+    
+<script>
+    var width = 250;
+    var height = 250;
+    $("<canvas/>", {
+        id: "canvas",
+    }).css({
+        "position": "absolute",
+        "top": 0,
+        "left": 0 
+    }).appendTo($("#canvas-container"));
+    var canvas = $("#canvas");
+    canvas[0].width = width;
+    canvas[0].height = height;
+    
+    var context = canvas[0].getContext("2d");
+    
+    setInterval(update, 1000/60);
+    
+    var Point = function(x, y, z) {
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
+    }
+    
+    Point.prototype.constructor = Point;
+    
+    function line(point1, point2) {
+        context.beginPath();
+        context.moveTo(point1.x, point1.y);
+        context.lineTo(point2.x, point2.y);
+        context.closePath();
+        context.stroke(); 
+    }
+    
+    function point(point) {
+        context.fillRect(point.x-2.5, point.y-2.5, 5, 5);
+    }
+    
+    function len2(point) {
+        return point.x * point.x + point.y * point.y;   
+    }
+    
+    function len(point) {
+        return Math.sqrt(len2(point));   
+    }
+     
+    function nor(point) {
+//        console.log("len "+2);
+        var len = len(point);
+        
+        var nx = point.x, ny = point.y, nz = point.z;
+        if (len!=0) {
+            nx /= len;
+            ny /= len;
+            nz /= len;
+        }
+        return new Point(nx, ny, nz);
+    }
+    
+    function sub(pointA, pointB) {
+        return new Point(pointA.x - pointB.x, pointA.y - pointB.y, pointA.z - pointB.z);
+    }
+    
+    function update() {
+        context.clearRect(0, 0, width, height);
+        
+        var controlPoint1 = new Point(25, 15);
+        var controlPoint2 = new Point(200, 30);
+        
+        context.fillStyle = "red";
+        point(controlPoint1);
+        point(controlPoint2);
+        
+        context.lineWidth = 0.5;
+        context.strokeStyle = "rgba(100, 100, 200, 0.85)";
+        line(controlPoint1, controlPoint2);
+        
+        var mid = new Point((controlPoint1.x + controlPoint2.x) / 2, (controlPoint1.y + controlPoint2.y) / 2);
+        point(mid);
+        
+        var dir = sub(controlPoint2, mid);
+        var ndir = nor(dir);
+//        var perp = new Point(-ndir.y, ndir.x);
+//        
+//        var fallAmount = 5;
+//        var down = new Point(mid.x + perp.x * fallAmount, mid.y + perp.y * fallAmount);
+//        point(down);
+        
+        var cx = width/2;
+        var cy = height/2;
+        
+        //length of the non-sticky radii the spider walks along
+        var radius = 50;
+        
+        //context.fillStyle = "red";
+        //context.fillRect(0, 0, width, height);
+        
+    }
+</script>
+      
+  </body>
+</html>
