@@ -18,4 +18,4 @@ beefy src/simple.js 8080 --live -- --require '../lib/index.js:knit'
 
 You can replace `src/simple.js` with another demo file in the `src` folder.
 
-Open `localhost:8080` in your browser to see the demo. Changing the JS file should refresh the browser page.
+Open `localhost:8080` in your browser to see the demo. Changing the JS file should refresh the browser page. 
