@@ -19,14 +19,12 @@ $(function() {
 
 	var context = canvas[0].getContext("2d");
 
-
-
     var clothWidth = 50;
     var clothHeight = 55;
     var start_x = 50;
     var start_y = 100;
     var spacing = 5;
-    var stiff = 0.02;
+    var stiff = 0.9;
     var tear = 30; //at what distance does a constraint "tear" ? 
     
     var mouseInfluence = 5;

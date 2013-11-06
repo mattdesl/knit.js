@@ -5,6 +5,11 @@
   "description": "knit.js is a simple Verlet physics engine for fabric, string and cloth effects",
   "contributors": [],
   "dependencies": {
+    "minivec": "git://github.com/mattdesl/minivec",
+    "minimath": "git://github.com/mattdesl/minimath",
+    "jsOOP": "git://github.com/mattdesl/jsOOP"
+  },
+  "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-contrib-uglify": "~0.2.0",
