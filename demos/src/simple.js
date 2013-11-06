@@ -36,10 +36,9 @@ $(function() {
     
     var mouseTearInfluence = 4;
     var gravity = 0;
-    var mass = 0.1;
+    var mass = 1.;
     var useFloor = true;
     
-    var fontSize = 250; 
 
     var usePins = false; //we need to pin the cloth up if we have gravity enabled
 
@@ -67,13 +66,13 @@ $(function() {
     canvas.mousedown(function(ev) {
         if (ev.which == 1)
             mouseDown = true;
-    });
+    }); 
     canvas.mouseup(function(ev) {
         if (ev.which == 1)
             mouseDown = false;
     });
      
-    
+     
     canvas.mousemove(function(ev) {
         if (mouseDown) {
             world.applyTear(ev.clientX, ev.clientY, mouseTearInfluence);
@@ -126,18 +125,18 @@ $(function() {
             var p = world.points[i];    
             context.fillStyle = "rgba(0,0,0,0.5)";
             context.strokeStyle = "rgba(25,25,25,0.95)";
-            context.lineWidth = 0.5;
-            
+            context.lineWidth = 0.5; 
+         
+
+            //This is the line rendering (like cloth)
             // for (var j=0; j<p.constraints.length; j++) {
             //     var c = p.constraints[j];
-            //     //Render as lines (like a cloth)
             //     context.moveTo(c.p1.position.x, c.p1.position.y);
             //     context.lineTo(c.p2.position.x, c.p2.position.y);                
             // }
-            // 
-            if (i%8===0)
-                continue;
             
+
+            //This is the point rendering (more like fluid)
             if (p.constraints.length > 0) {
                 var c = p.constraints[0];
                 context.fillRect(c.p1.position.x, c.p1.position.y, 2.5, 2.5);
