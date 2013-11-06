@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width">
+    <title>Woven Silk</title>
+<!--    <link rel="stylesheet" href="/css/normalize.min.css">-->
+<!--    <script src="js/vendor/jquery-1.10.1.min.js" type="text/javascript"></script>-->
+    <script src="js/vendor/jquery-1.10.1.min.js"></script>
+    <script src="js/vendor/poly2tri.js"></script>
+    <script src="js/vendor/typeface-0.15.js"></script>
+    <script src="js/vendor/helvetiker_regular.typeface.js"></script>
+    <script src="js/vendor/helvetiker_bold.typeface.js"></script>
+    <script src="js/vendor/helvetiker_bold_italic.typeface.js"></script>
+    <script src="js/vendor/montserrat_bold.typeface.js"></script>
+    <script src="js/vendor/montserrat_regular.typeface.js"></script>
+    <script src="js/vendor/stalemate_regular.typeface.js"></script>
+    
+    <script src="js/vendor/dancer.min.js"></script>
+      
+    <script src="js/Knit.js"></script>
+    <script src="js/TypeUtil.js"></script>
+    <script src="js/KnitFabrics.js"></script>
+    
+    <script src="js/vendor/raf.js"></script>
+    <script src="js/CanvasUtil.js"></script>
+     
+    <style type="text/css">
+        * { margin: 0; padding: 0; }
+        
+        body { background-color: white; }
+        canvas { background-color: lightGray; }
+    </style>
+  </head>
+     
+  <body> 
+      
+      <div id="canvas-container">
+      </div>  
+<script>
+    var width = window.innerWidth/2, height = window.innerHeight/2;
+    var canvas = CanvasUtil.createCanvas(width, height);
+    canvas.appendTo($("#canvas-container"));
+    
+    var context = canvas[0].getContext("2d");
+    
+    setInterval(update, 1000/60);
+    
+    var mouseInfluence = 15;
+    var mouseScale = 0.5;
+    var mouseMaxDist = 15;
+    
+    var mouseTearInfluence = 15;
+    var gravity = 100;
+    var useFloor = true;
+    
+    var enableWind = false;
+    
+    var world = new Knit.World(new Knit.Vec2(0, gravity));
+    world.setPinRemoveInfluence(50);
+    var endPoint = null;
+    
+    CanvasUtil.addPinInteraction(canvas, world);
+    
+    var style = "black";
+    var dancer = new Dancer();
+    
+    function onKick() {
+//        style = "red";
+        if (world.points.length!==0) {
+            var lowP = world.points[ ~~(world.points.length*0.15) ];
+            var midP = world.points[ ~~(world.points.length/2) ]
+            var highP = world.points[ ~~(world.points.length*0.85) ];
+            
+            var low = dancer.getFrequency(0, 2);
+            var mid = dancer.getFrequency(2, 3);
+            var high = dancer.getFrequency(4, 5);
+            
+            var t = 0.1;
+            if (low > 0.05)
+                lowP.position.y -= 2;  
+            if (mid > 0.1)
+                midP.position.y -= 1;
+            if (high > 0.1)
+                highP.position.y -= 2;
+            
+            
+//            for (var i=0; i<world.points.length; i++) {
+//
+//                if ( Math.abs( ~~(world.points.length*0.3) - i) < 5 ) {
+//                    world.points[i].position.y -= 0.5;
+//                    
+//                }
+//            }
+        }
+    }
+    
+    
+    
+    function offKick() {
+        style = "black";   
+    }
+    
+    //add some music
+    var AUDIO_FILE = "audio/missyou";
+    
+    var kick = dancer.createKick({
+        onKick: onKick, 
+        offKick: offKick,
+        threshold: 0.1,
+        frequency: [0, 10]
+    }).on();
+    dancer.load({src: AUDIO_FILE, codecs: [ 'mp3' ]});
+    
+    if (Dancer.isSupported()) {
+        console.log("Supported");   
+    }
+    if (!dancer.isLoaded()) {
+        
+        dancer.bind("loaded", function() {
+            console.log("loaded");
+            dancer.play();  
+            dancer.setVolume(0.25);
+        });
+    }
+    //debugging
+    window.dancer = dancer;
+    
+    
+    
+    if (useFloor) {
+        world.bounds = new Knit.Rect(0, 0, width, height);
+        world.floor = height-5;
+    }
+    
+    $(document).keypress(function(e) {
+        world.points = [];
+        createFabrics(); 
+    }); 
+    $(function() {
+        createFabrics();
+    });  
+    
+    var mouseDown = false;
+    canvas.mousedown(function(ev) {
+        if (ev.which == 1)
+            mouseDown = true;
+    });
+    canvas.mouseup(function(ev) {
+        if (ev.which == 1)
+            mouseDown = false;
+    });
+     
+    canvas.mousemove(function(ev) {
+        if (mouseDown) {
+            if (!CanvasUtil.isMouseOverPin())
+                world.applyTear(ev.clientX, ev.clientY, mouseTearInfluence);
+            world.applyMotion(ev.clientX, ev.clientY, mouseInfluence, mouseScale, mouseMaxDist);
+        } else
+            world.applyMotion(ev.clientX, ev.clientY, mouseInfluence, mouseScale, mouseMaxDist);
+        mouseX = ev.clientX;
+        mouseY = ev.clientY;
+    });
+    
+    function createFabrics() {
+//        var str = new Knit.Twine({ start:new Knit.Vec2(100, 100), end:new Knit.Vec2(110, 150), steps: 50 });
+//        endPoint = str.points[str.points.length-1];    
+//        world.addPoints(str.points);
+        
+        var path = new Knit.Path();
+//        path.tearDistance = 50;
+        path.stiffness = 0.15;
+        path.mass = 1;
+        
+//        path.pinNext(); 
+//        path.moveTo(300, 50);
+//        path.lineTo(310, 100);
+//        
+//        path.moveTo(500, 40);
+//        path.pinNext();
+//        path.lineTo(550, 100);
+//        path.pinLast();
+//        path.lineTo(600, 70); 
+//        path.pinLast();
+//        path.close();
+//        path.pinLast();
+        
+        //path.pinNext();
+        path.steps = 20;
+        
+        path.pinNext();
+        path.moveTo(25, height/2);
+        path.lineTo(width-25, height/2);
+        path.pinLast();
+        
+        console.log(path.points.length);
+        
+        world.addPoints(path.points);
+    }
+     
+    function update() { 
+        context.clearRect(0, 0, width, height);
+        
+        world.step(0.016);
+        
+        context.fillStyle = "black";
+        context.strokeStyle = style;
+        context.lineWidth = 0.5;
+        
+        CanvasUtil.drawPoints(world, context);
+        CanvasUtil.drawPins(world, context);
+        
+        if (endPoint) {
+            context.fillStyle = "red";
+            var sz = 10;
+            context.fillRect(endPoint.position.x-sz/2, endPoint.position.y-sz/2, sz, sz);
+        }
+        
+        context.beginPath(); 
+//        context.moveTo(300, 250);
+//        context.lineTo(310, 200);
+//        context.lineTo(500, 500);
+//        
+//        context.moveTo(400, 250);
+//        context.lineTo(450, 300);
+//        context.lineTo(500, 200);
+//        context.moveTo(500, 500);
+        
+//        var steps = 5;
+//        var wstep = width/(steps-1);
+//        context.fillStyle = "black";
+//        var c = 0;
+//        for (var i=0; i<width+wstep; i+=wstep) {
+//            var t = (i)/width; 
+//            var start = t.toFixed(2) * 10;
+//            var end = ((i+wstep) / (width)).toFixed(2) * 10;
+//            var xoff = 5;
+//            var yoff = 5;
+//            if (c==steps-1) {
+//                xoff = -50;
+//                yoff = -10;
+//            }
+//            context.fillText(start+" - "+end, i+xoff, ~~(height*0.9)+yoff);
+//            context.fillRect(i-2.5, height*.9, 4, 4);
+//            c++;
+//        }
+        
+        for (var i=0; i<width; i++) {
+            var t = i/width;
+            t = i / (width/2);
+            
+            var s = Knit.smoothstep(0.0, 1.0, t);
+            
+            var x = i;
+            var y = s*height;
+            
+            context.fillRect(x, y, 2, 2);
+        }
+        
+        
+        context.moveTo(20,20);
+//        context.bezierCurveTo(20,100,200,100,200,20);
+        
+//        context.closePath();
+        context.stroke();
+    }
+</script>
+       
+<!--      <div>Hi thasere</div>-->
+  </body>
+</html>
+
+
