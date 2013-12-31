@@ -8,7 +8,7 @@
   "dependencies": {
     "minivec": "git://github.com/mattdesl/minivec",
     "minimath": "git://github.com/mattdesl/minimath",
-    "jsOOP": "git://github.com/mattdesl/jsOOP"
+    "klasse": "git://github.com/mattdesl/klasse#v1.0.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
