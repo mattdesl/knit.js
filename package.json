@@ -8,7 +8,8 @@
   "dependencies": {
     "minivec": "git://github.com/mattdesl/minivec",
     "minimath": "git://github.com/mattdesl/minimath",
-    "klasse": "git://github.com/mattdesl/klasse#v1.0.0"
+    "klasse": "git://github.com/mattdesl/klasse#v1.0.0",
+    "vecmath": "0.0.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
