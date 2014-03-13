@@ -7,9 +7,9 @@
   "main": "lib/index.js",
   "dependencies": {
     "minivec": "git://github.com/mattdesl/minivec",
-    "minimath": "git://github.com/mattdesl/minimath",
-    "klasse": "git://github.com/mattdesl/klasse#v1.0.0",
-    "vecmath": "0.0.3"
+    "minimath": "0.0.0",
+    "klasse": "~1.0.8",
+    "vecmath": "~0.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

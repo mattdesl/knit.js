@@ -1,15 +1,9 @@
-var Vector2 = require('minivec').Vector2;
-var Rectangle = require('minimath').Rectangle;
+var Vector2 = require('vecmath').Vector2;
 var World = require('knit').World;
 
 
 var Constraint = require('knit').Constraint;
 var PointMass = require('knit').PointMass;
-
-var rand = require('minimath').random;
-var dist = require('minimath').distance;
-var lerp = require('minimath').lerp;
-var smoothstep = require('minimath').smoothstep;
 
 $(function() {
         var width = 500;
@@ -53,10 +47,10 @@ $(function() {
         world.removablePins = true;
         world.setPinRemoveInfluence(15);
 
-        if (useFloor) {
-            world.bounds = new Rectangle(0, 0, width, height);
-            world.floor = height - 5;
-        }
+        // if (useFloor) {
+        //     world.bounds = new Rectangle(0, 0, width, height);
+        //     world.floor = height - 5;
+        // }
 
         $(document).keypress(function(e) {
             
