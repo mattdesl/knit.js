@@ -43,7 +43,7 @@ $(function() {
 
         var usePins = false; //we need to pin the cloth up if we have gravity enabled
 
-        var world = new World(new Vector2(0, gravity));
+        var world = new World(new Vector2(0, 200));
         world.removablePins = true;
         world.setPinRemoveInfluence(15);
 

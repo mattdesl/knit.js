@@ -44,7 +44,7 @@ $(function() {
 
         var usePins = false; //we need to pin the cloth up if we have gravity enabled
 
-        var world = new World(new Vector2(0, gravity));
+        var world = new World(new Vector2(0, 200));
         world.removablePins = true;
         world.setPinRemoveInfluence(15);
 
@@ -906,7 +906,9 @@ var Twine = new Class({
 });
 
 module.exports = Twine;
-},{"../PointMass":4,"klasse":11,"minimath":13,"vecmath":21}],"tKAC0t":[function(require,module,exports){
+},{"../PointMass":4,"klasse":11,"minimath":13,"vecmath":21}],"knit":[function(require,module,exports){
+module.exports=require('tKAC0t');
+},{}],"tKAC0t":[function(require,module,exports){
 module.exports = {
 	World: require('./World'),
 	Constraint: require('./Constraint'),
@@ -917,9 +919,7 @@ module.exports = {
 	Path: require('./ext/Path'),
 	Twine: require('./ext/Twine')
 };
-},{"./Constraint":2,"./Influence":3,"./PointMass":4,"./TearInfluence":5,"./World":6,"./ext/Path":7,"./ext/Twine":8}],"knit":[function(require,module,exports){
-module.exports=require('tKAC0t');
-},{}],11:[function(require,module,exports){
+},{"./Constraint":2,"./Influence":3,"./PointMass":4,"./TearInfluence":5,"./World":6,"./ext/Path":7,"./ext/Twine":8}],11:[function(require,module,exports){
 function hasGetterOrSetter(def) {
 	return (!!def.get && typeof def.get === "function") || (!!def.set && typeof def.set === "function");
 }
