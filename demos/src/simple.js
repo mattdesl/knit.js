@@ -21,8 +21,8 @@ $(function() {
 
         var context = canvas[0].getContext("2d");
 
-        var clothWidth = width;
-        var clothHeight = height;
+        var clothWidth = 200;
+        var clothHeight = 200;
         var start_x = 0;
         var start_y = 0;
         var spacing = 12;
