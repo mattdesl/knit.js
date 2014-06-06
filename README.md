@@ -5,7 +5,7 @@ Knit is a simple JavaScript Verlet physics engine for fabric and cloth effects
 
 # Live demo
 
-http://mattdesl.github.io/knit.js/demos/index.html
+http://mattdesl.github.io/knit.js/dist/index.html
 
 # Running the demos
 
