@@ -4,6 +4,10 @@
   "author": "Matt DesLauriers <mattd@jam3.com>",
   "description": "knit.js is a simple Verlet physics engine for fabric, string and cloth effects",
   "contributors": [],
+  "scripts": {
+    "copy": "cp demos/index.html dist/index.html && cp -r demos/vendor dist",
+    "build": "npm run copy && browserify demos/src/simple.js -o dist/src/simple.js -r './lib/index.js:knit'"
+  },
   "main": "lib/index.js",
   "dependencies": {
     "minivec": "git://github.com/mattdesl/minivec",

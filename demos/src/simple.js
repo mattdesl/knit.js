@@ -25,7 +25,7 @@ $(function() {
         var clothHeight = height;
         var start_x = 0;
         var start_y = 0;
-        var spacing = 9;
+        var spacing = 12;
         var stiff = 0.1;
         var tear = 110; //at what distance does a constraint "tear" ?
 
@@ -39,7 +39,7 @@ $(function() {
         var mass = 1;
         var useFloor = false;
 
-        var cloth = false;
+        var cloth = true;
 
         var usePins = false; //we need to pin the cloth up if we have gravity enabled
 
@@ -175,6 +175,7 @@ $(function() {
                 }
             }
             if (cloth) {
+                context.fillStyle = 'black';
                 context.closePath();
                 context.stroke();
             }
