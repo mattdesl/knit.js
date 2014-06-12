@@ -10,7 +10,6 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "minivec": "git://github.com/mattdesl/minivec",
     "klasse": "~1.0.8",
     "vecmath": "~0.1.0",
     "minimath": "git://github.com/mattdesl/minimath"
